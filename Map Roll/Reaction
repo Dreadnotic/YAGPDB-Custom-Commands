@@ -1,0 +1,71 @@
+{{$perms := "Administrator"}}
+{{ $admin := false }}
+{{if (reFind $perms (index (reFindAllSubmatches `.*\n\x60\d+\x60\n(.*)` (exec "viewperms")) 0 1))}}
+	{{ $admin = true }}
+{{ end }}
+{{ if or (eq (str .Channel.ID) (dbGet .Guild.ID "mapRollChan").Value) (eq (str .Channel.ID) (dbGet .Guild.ID "adminChan").Value) }}
+{{ $data := sdict }}
+{{ $png := "https://i.imgur.com/jrXZdf2.png" }}
+{{ $gif := "https://i.imgur.com/0oIhjq1.gif" }}
+ 
+{{ if and (not .User.Bot) (or (inFold (cslice "1️⃣" "2️⃣" "3️⃣" "4️⃣" "⏪" ) .Reaction.Emoji.Name) (eq (str .Reaction.Emoji.ID) "766240492840288276")) }}
+	{{ $db := (dbGet .User.ID "rollHelp").Value }}
+	{{ if $db }}
+		{{ if eq (toInt $db) .Reaction.MessageID }}
+			{{ if eq .Reaction.Emoji.Name "1️⃣" }}
+				{{ execCC 49 nil 0 (sdict "MapRoll" true "Reaction" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID) "EmojiNumbers" false) }}
+			{{ else if eq .Reaction.Emoji.Name "2️⃣" }}
+				{{ execCC 49 nil 0 (sdict "View" true "Reaction" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID) "EmojiNumbers" false) }}
+			{{ else if eq .Reaction.Emoji.Name "3️⃣" }}
+				{{ execCC 49 nil 0 (sdict "Submit" true "Reaction" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID) "EmojiNumbers" false) }}
+			{{ else if and (eq .Reaction.Emoji.Name "4️⃣") $admin }}
+				{{ execCC 49 nil 0 (sdict "AdminOnly" true "Reaction" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID) "EmojiNumbers" false) }}
+			{{ else if eq .Reaction.Emoji.Name "⏪" }}
+				{{ execCC 49 nil 0 (sdict "MainMenu" true "Reaction" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID) "EmojiNumbers" true) }}
+			{{ else if eq (str .Reaction.Emoji.ID) "766240492840288276" }}
+				{{ execCC 49 nil 0 (sdict "Dreadnotic" true "Reaction" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID)) }}
+			{{ end }}	
+		{{ end }}
+	{{ end }}
+{{ else if and (not .User.Bot) (or (inFold (cslice "763074291297288212" "763074290940772392" "763074290567741481" "763074290450169876") (str .Reaction.Emoji.ID)) (eq .Reaction.Emoji.Name "🎲")) }}
+	{{ $dbRoll := dbGet .User.ID "roll" }}
+	{{ if $dbRoll }}
+		{{ $msg := (getMessage .Reaction.ChannelID .Reaction.MessageID) }}
+		{{ if $msg.Embeds }}
+			{{ $embed := structToSdict (index $msg.Embeds 0) }}
+			{{ range $k, $v := $embed }}
+				{{- if eq (kindOf $v true) "struct" }}
+				{{- $embed.Set $k (structToSdict $v) }}
+				{{- end -}}
+			{{ end }}
+			{{ if $embed.Author }} {{ $embed.Author.Set "Icon_URL" $embed.Author.IconURL }} {{ end }}
+			{{ if $embed.Footer }} {{ $embed.Footer.Set "Icon_URL" $embed.Footer.IconURL }} {{ end }}
+			{{ $embed.Set "description" (joinStr "" "<@!" .User.ID ">, rolling the dice now!") }}
+			{{ $embed.Thumbnail.Set "url" $gif }}
+			{{ editMessage .Reaction.ChannelID .Reaction.MessageID (complexMessageEdit "embed" $embed) }}
+ 
+			{{ sleep 5 }}
+			{{ $roll1 := 0}}
+			{{ if eq .Reaction.Emoji.Name "🎲" }} {{ $roll1 = randInt 1 5 }}
+			{{ else if eq (str .Reaction.Emoji.ID) "763074291297288212" }} {{ $roll1 = 1 }} 
+			{{ else if eq (str .Reaction.Emoji.ID) "763074290940772392" }} {{ $roll1 = 2 }} 
+			{{ else if eq (str .Reaction.Emoji.ID) "763074290567741481" }} {{ $roll1 = 3 }} 
+			{{ else if eq (str .Reaction.Emoji.ID) "763074290450169876" }} {{ $roll1 = 4 }} 
+			{{ end }}
+			{{ $roll2 := "" }}
+			{{ $license := "" }}
+			{{ if eq $roll1 1}} {{ $roll2 = randInt 1 7 }} {{ $license = "L1" }}
+			{{ else if eq $roll1 2}} {{ $roll2 = randInt 1 14 }} {{ $license = "L2" }}
+			{{ else if eq $roll1 3}} {{ $roll2 = randInt 1 13 }} {{ $license = "L3" }}
+			{{ else if eq $roll1 4}} {{ $roll2 = randInt 1 12 }} {{ $license = "R" }}
+			{{ end }}
+			{{ $embed.Thumbnail.Set "url" $png }}
+			{{ $embed.Set "description" (joinStr "" "<@!" .User.ID ">, you rolled: \n\n🎲 " $roll1 "\nLicense: " $license "\n\n🎲 " $roll2 "\nMap ID: #" $roll2) }}
+			{{ editMessage .Reaction.ChannelID .Reaction.MessageID (complexMessageEdit "embed" $embed) }}
+			{{ dbDel .User.ID "roll" }}
+			{{ $data := sdict "License" $roll1 "MapID" $roll2 }}
+			{{ execCC 42 nil 0 $data }}
+		{{ end }}
+	{{ end }}
+{{ end }}
+{{ end }}
