@@ -1,0 +1,118 @@
+{{ $error := 0 }}
+{{$perms := "Administrator"}}
+{{ if (reFind $perms (index (reFindAllSubmatches `.*\n\x60\d+\x60\n(.*)` (exec "viewperms")) 0 1)) }}
+	{{ $newRecord := "" }}
+	{{ $recDeleted := false }}
+	{{ $args := parseArgs 0 "Something went wrong!" (carg "string" "license") (carg "int" "mapID") (carg "int" "Record#") }}
+	{{ if $args.IsSet 0 }}
+		{{ if inFold (cslice "L1" "L2" "L3" "R") (upper ($args.Get 0)) }}
+			{{ if and (eq (upper ($args.Get 0)) "L1") (gt ($args.Get 1) 0) (lt ($args.Get 1) 7) }}
+				{{ if $args.IsSet 2 }}
+					{{ if and (gt ($args.Get 2) 0) (lt ($args.Get 2) 11) }}
+						{{ $db := (dbGet 1 (str ($args.Get 1))).Value }}
+						{{ if $db }}
+							{{ range $k, $v := (split $db " , ") }}
+								{{- if ne (add $k 1) ($args.Get 2) -}}
+									{{- if eq $k 0 -}}
+										{{- $newRecord = $v -}}
+									{{- else if and (eq $k 1) $recDeleted -}}
+										{{- $newRecord = $v -}}
+									{{- else -}}
+										{{- $newRecord = joinStr "" $newRecord " , " $v -}}
+									{{- end -}}
+								{{- else -}}
+									{{- $recDeleted = true -}}
+								{{- end -}}
+							{{ end }}
+							{{ dbSet 1 (str ($args.Get 1)) $newRecord }}
+							Record deleted!
+						{{ else }}
+							No record to delete.
+						{{ end }}
+					{{ end }}
+				{{ end }}
+			{{ else if and (eq (upper ($args.Get 0)) "L2") (gt ($args.Get 1) 0) (lt ($args.Get 1) 14) }}
+				{{ if $args.IsSet 2 }}
+					{{ if and (gt ($args.Get 2) 0) (lt ($args.Get 2) 11) }}
+						{{ $db := (dbGet 2 (str ($args.Get 1))).Value }}
+						{{ if $db }}
+							{{ range $k, $v := (split $db " , ") }}
+								{{- if ne (add $k 1) ($args.Get 2) -}}
+									{{- if eq $k 0 -}}
+										{{- $newRecord = $v -}}
+									{{- else if and (eq $k 1) $recDeleted -}}
+										{{- $newRecord = $v -}}
+									{{- else -}}
+										{{- $newRecord = joinStr "" $newRecord " , " $v -}}
+									{{- end -}}
+								{{- else -}}
+									{{- $recDeleted = true -}}
+								{{- end -}}
+							{{ end }}
+							{{ dbSet 2 (str ($args.Get 1)) $newRecord }}
+							Record deleted!
+						{{ else }}
+							No record to delete.
+						{{ end }}
+					{{ end }}
+				{{ end }}
+			{{ else if and (eq (upper ($args.Get 0)) "L2") (gt ($args.Get 1) 0) (lt ($args.Get 1) 13) }}
+				{{ if $args.IsSet 2 }}
+					{{ if and (gt ($args.Get 2) 0) (lt ($args.Get 2) 11) }}
+						{{ $db := (dbGet 3 (str ($args.Get 1))).Value }}
+						{{ if $db }}
+							{{ range $k, $v := (split $db " , ") }}
+								{{- if ne (add $k 1) ($args.Get 2) -}}
+									{{- if eq $k 0 -}}
+										{{- $newRecord = $v -}}
+									{{- else if and (eq $k 1) $recDeleted -}}
+										{{- $newRecord = $v -}}
+									{{- else -}}
+										{{- $newRecord = joinStr "" $newRecord " , " $v -}}
+									{{- end -}}
+								{{- else -}}
+									{{- $recDeleted = true -}}
+								{{- end -}}
+							{{ end }}
+							{{ dbSet 3 (str ($args.Get 1)) $newRecord }}
+							Record deleted!
+						{{ else }}
+							No record to delete.
+						{{ end }}
+					{{ end }}
+				{{ end }}
+			{{ else if and (eq (upper ($args.Get 0)) "R") (gt ($args.Get 1) 0) (lt ($args.Get 1) 12) }}
+				{{ if $args.IsSet 2 }}
+					{{ if and (gt ($args.Get 2) 0) (lt ($args.Get 2) 11) }}
+						{{ $db := (dbGet 4 (str ($args.Get 1))).Value }}
+						{{ if $db }}
+							{{ range $k, $v := (split $db " , ") }}
+								{{- if ne (add $k 1) ($args.Get 2) -}}
+									{{- if eq $k 0 -}}
+										{{- $newRecord = $v -}}
+									{{- else if and (eq $k 1) $recDeleted -}}
+										{{- $newRecord = $v -}}
+									{{- else -}}
+										{{- $newRecord = joinStr "" $newRecord " , " $v -}}
+									{{- end -}}
+								{{- else -}}
+									{{- $recDeleted = true -}}
+								{{- end -}}
+							{{ end }}
+							{{ dbSet 4 (str ($args.Get 1)) $newRecord }}
+							Record deleted!
+						{{ else }}
+							No record to delete.
+						{{ end }}
+					{{ end }}
+				{{ end }}
+			{{ else }} {{ $error = 1 }}
+			{{ end }}
+		{{ else }} {{ $error = 1 }}
+		{{ end }}
+	{{ else }} {{ $error = 1 }}
+	{{ end }}
+	{{ if ne $error 0 }}
+		{{ execCC 49 nil 0 (sdict "AdminOnly" true) }}
+	{{ end }}
+{{ end }}
