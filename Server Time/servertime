@@ -1,0 +1,104 @@
+{{ $args := parseArgs 0 "Command usage: ?servertime <server> \nServers available: west, korea, sea"
+	(carg "string" "timezone")}}
+
+{{ $assets := sdict
+	"west" (sdict
+		"image" "https://i.imgur.com/XMv2fwG.png"
+		"color" 358861
+		"timezone" "America/Los_Angeles"
+	)
+	"korea" (sdict
+		"image" "https://i.imgur.com/j79WfEW.png"
+		"color" 15467781
+		"timezone" "Asia/Pyongyang"
+	)
+	"sea" (sdict
+		"image" "https://i.imgur.com/qlU6iJR.png"
+		"color" 363013
+		"timezone" "Asia/Singapore"
+	)
+}}
+
+{{ $marker := "west"}}
+
+{{ if $args.IsSet 0 }}
+	{{ $argument := $args.Get 0 }}
+	
+	{{ if eq $argument "west" }}
+		{{ $marker = $argument }}
+	{{ else if eq $argument "sea" }}
+		{{ $marker = $argument }}
+	{{ else if eq $argument "korea" }}
+		{{ $marker = $argument }}
+	{{ else if eq $argument "all" }}
+		{{ $marker = "all" }}
+	{{ else }}
+		{{ $marker = "error" }}
+	{{ end }}	
+{{ end }}
+
+{{ if eq $marker "error" }}
+	Incorrect command usage!
+Correct usage: ?servertime <server> 
+Servers available: west, korea, sea, all
+{{ else if eq $marker "all" }}
+	{{ $marker = "west" }}
+	{{ $asset := $assets.Get $marker }}
+	{{ $timezone := $asset.timezone }}
+
+	{{ $now := currentTime.In (newDate 0 0 0 0 0 0 $timezone).Location }}
+
+	{{ $time := $now.Format "3:04 PM" }}
+	{{ $date := $now.Format "Monday, January 2, 2006" }}
+	{{ $embed := cembed
+		"color" $asset.color
+		"thumbnail" (sdict "url" $asset.image)
+		"description" (printf "❯ **In-Game Time:** %s\n❯ **Date:** %s" $time $date)
+	}}
+	{{ sendMessage nil $embed }}
+
+	{{ $marker = "korea" }}
+	{{ $asset := $assets.Get $marker }}
+	{{ $timezone := $asset.timezone }}
+
+	{{ $now := currentTime.In (newDate 0 0 0 0 0 0 $timezone).Location }}
+
+	{{ $time := $now.Format "3:04 PM" }}
+	{{ $date := $now.Format "Monday, January 2, 2006" }}
+	{{ $embed := cembed
+		"color" $asset.color
+		"thumbnail" (sdict "url" $asset.image)
+		"description" (printf "❯ **In-Game Time:** %s\n❯ **Date:** %s" $time $date)
+	}}
+	{{ sendMessage nil $embed }}
+
+	{{ $marker = "sea" }}
+	{{ $asset := $assets.Get $marker }}
+	{{ $timezone := $asset.timezone }}
+
+	{{ $now := currentTime.In (newDate 0 0 0 0 0 0 $timezone).Location }}
+
+	{{ $time := $now.Format "3:04 PM" }}
+	{{ $date := $now.Format "Monday, January 2, 2006" }}
+	{{ $embed := cembed
+		"color" $asset.color
+		"thumbnail" (sdict "url" $asset.image)
+		"description" (printf "❯ **In-Game Time:** %s\n❯ **Date:** %s" $time $date)
+	}}
+	{{ sendMessage nil $embed }}
+
+{{ else }}
+	{{ $asset := $assets.Get $marker }}
+	{{ $timezone := $asset.timezone }}
+
+	{{ $now := currentTime.In (newDate 0 0 0 0 0 0 $timezone).Location }}
+
+	{{ $time := $now.Format "3:04 PM" }}
+	{{ $date := $now.Format "Monday, January 2, 2006" }}
+	{{ $embed := cembed
+		"color" $asset.color
+		"thumbnail" (sdict "url" $asset.image)
+		"description" (printf "❯ **In-Game Time:** %s\n❯ **Date:** %s" $time $date)
+	}}
+	{{ sendMessage nil $embed }}
+{{ end }}
