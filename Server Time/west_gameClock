@@ -1,0 +1,1 @@
+{{editChannelName "750322010906951700" (joinStr "" "Game Time: " ((currentTime.Add (toDuration (mult -7 .TimeHour))).Format "3:04PM")) }}
