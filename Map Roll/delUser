@@ -1,0 +1,16 @@
+{{$perms := "Administrator"}}
+{{if (reFind $perms (index (reFindAllSubmatches `.*\n\x60\d+\x60\n(.*)` (exec "viewperms")) 0 1))}}
+	{{ $error := 0 }}
+	{{ $user := userArg .User.ID }}
+	{{ $args := parseArgs 0 "Something went wrong!" (carg "string" "mention") }}
+	{{ if $args.IsSet 0 }}
+		{{ $user := userArg ($args.Get 0) }}
+		{{ if not $user }} {{ $error = 1 }} {{ end }}
+	{{ end }}
+	{{ if eq $error 0 }}
+		Deleting user records...
+		{{ dbDel $user.ID "records" }}
+	{{ else }}
+		{{ execCC 49 nil 0 (sdict "AdminOnly" true) }}
+	{{ end }}
+{{ end }}
