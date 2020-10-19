@@ -1,0 +1,48 @@
+{{/* View Records Command */}}
+{{/* Required Arguments: <license> (L1-R:1-4) */}}
+{{/* Optional Arguments: <map ID> */}}
+{{/* Flags for <MapID>: "records" (shows all top 10 records)*/}}
+{{/* Example: ?<command> 1 1 showrecord */}}
+ 
+{{ if or (eq (str .Channel.ID) (dbGet .Guild.ID "adminChan").Value) (eq (str .Channel.ID) (dbGet .Guild.ID "mapRollChan").Value) }}
+{{ $args := parseArgs 0 "Something went wrong!" (carg "string" "license") (carg "string" "mapID") (carg "string" "flags") }}
+{{ $data := sdict }}
+{{ if $args.IsSet 0 }}
+	{{ if eq (lower ($args.Get 0)) "myrecord" }}
+		{{ $data.Set "MyRecord" true }}
+	{{ else }}
+		{{ $maps := 0 }}
+		{{ $license := upper (str ($args.Get 0)) }}
+		{{ if eq $license "L1" }}
+			{{ $data.Set "License" 1 }}
+			{{ $maps = 6 }}
+		{{ else if eq $license "L2" }}
+			{{ $data.Set "License" 2 }}
+			{{ $maps = 13 }}
+		{{ else if eq $license "L3" }}
+			{{ $data.Set "License" 3 }}
+			{{ $maps = 12 }}
+		{{ else if eq $license "R" }}
+			{{ $data.Set "License" 4 }}
+			{{ $maps = 11 }}
+		{{ else }}
+			{{ $data.Set "License" 0 }}
+		{{ end }}
+		{{ if $args.IsSet 1 }}
+			{{ if and (gt (toInt ($args.Get 1)) 0) (lt (toInt ($args.Get 1)) (add $maps 1)) }}
+				{{ $data.Set "MapID" (toInt ($args.Get 1)) }}
+			{{ else }}
+				{{ $data.Set "MapID" 999 }}
+			{{ end }}
+			{{ if $args.IsSet 2 }}
+				{{ if eq (lower ($args.Get 2)) "records" }}
+					{{ $data.Set "ShowRecord" true }}
+				{{ else }}
+					{{ $data.Set "FlagError" true }}
+				{{ end }}
+			{{ end }}
+		{{ end }}
+	{{ end }}
+{{ end }}
+{{ execCC 42 nil 0 $data }}
+{{ end }}
