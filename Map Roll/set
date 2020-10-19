@@ -1,0 +1,41 @@
+{{ $error := 0 }}
+{{$perms := "Administrator"}}
+{{if (reFind $perms (index (reFindAllSubmatches `.*\n\x60\d+\x60\n(.*)` (exec "viewperms")) 0 1))}}
+{{ if or (eq (str .Channel.ID) (dbGet .Guild.ID "adminChan").Value) (hasRoleID 747036783774007366) }}
+{{ $args := parseArgs 0 "Something went wrong!" (carg "string" "Name") (carg "channel" "ID") }}
+{{ $desc := "" }}
+{{ if $args.IsSet 0 }}
+	{{ if $args.IsSet 1 }}
+		{{ $channel := getChannel ($args.Get 1).ID }}
+		{{ if $channel }}
+			{{ if eq (lower ($args.Get 0)) "admin" }}
+				{{ dbSet .Guild.ID "adminChan" (str $channel.ID) }}
+				{{ dbSet .Guild.ID "setup" true }}
+				{{ sendMessage nil (cembed 
+					"title" "Admin-Only Channel"
+					"description" (joinStr "" "Admin channel has been set to: <#" $channel.ID ">")
+					"footer" (sdict "text" "Run the command again to set a new channel") ) }}
+			{{ else if eq (lower ($args.Get 0)) "maproll" }}
+				{{ dbSet .Guild.ID "mapRollChan" (str $channel.ID) }}
+				{{ dbSet .Guild.ID "setup" true }}
+				{{ $desc = joinStr "" "General Map Roll channel has been set to: <#" $channel.ID ">" }}
+				{{ sendMessage nil (cembed 
+					"title" "Map Roll Channel"
+					"description" (joinStr "" "Generl use channel has been set to: <#" $channel.ID ">")
+					"footer" (sdict "text" "Run the command again to set a new channel") ) }}
+			{{ end }}
+		{{ else }}
+			{{ $error = 1 }}
+		{{ end }}
+	{{ else }}
+		{{ $error = 2 }}
+	{{ end }}
+{{ else }}
+	{{ $error = 3 }}
+{{ end }} 
+{{ else }} {{ $error = 1 }}
+{{ end }}
+{{ if ne $error 0 }}
+	{{ execCC 49 nil 0 (sdict "AdminOnly" true) }}
+{{ end }}
+{{ end }}
