@@ -1,0 +1,210 @@
+{{/* Required: .ExecData: "License" int, "MapID" int, "UserID" int, "Time" string */}}
+{{ $error := 0 }}
+ 
+{{ $maps := sdict
+	"1" (sdict
+		"1" "Zigzag Downhill (Mine)"
+		"2" "Dizzying Downhill (Forest)"
+		"3" "Cosmic Canyon (Northeu)"
+		"4" "Unfinished Zone 5 (Factory)"
+		"5" "Demon King's Invitation (Tomb)"
+		"6" "The Gate of the Wonderland (Storybook)"
+		"License" "L1")
+	"2" (sdict
+		"1" "Brazil Circuit (WKC)"
+		"2" "Twirling Construction Site (Desert)"
+		"3" "Canopy Curve (Forest)"
+		"4" "Boombeard's Hideout (Pirate)"
+		"5" "Hidden Treasure (Pirate)"
+		"6" "The Great Wall (Village)"
+		"7" "Boomhill Tunnel (Village)"
+		"8" "Secrets of the Temple (Fairy)"
+		"9" "Frost Valley (Ice)"
+		"10" "Terracotta Twister (China)"
+		"11" "Huangshan Highway (China)"
+		"12" "Temple of Vroom (Gold)"
+		"13" "Secret Basement (Castle)"
+		"License" "L2")
+	"3" (sdict 
+		"1" "Training Center (Sword)"
+		"2" "Rio Downhill (World)"
+		"3" "The Forgotten City (Mechanic)"
+		"4" "Shipping Lanes (Beach)"
+		"5" "Paris Grand Prix (World)"
+		"6" "Dinosaur Arena (Jurassic)"
+		"7" "The Bridge of Fate (Village)"
+		"8" "Toy Factory (Block)"
+		"9" "Downtown Dubai (World)"
+		"10" "Korea Circuit (WKC)"
+		"11" "Rainslick Raceway (Moonhill)"
+		"12" "Dragon's Descent (Sword)"
+		"License" "L3")
+	"4" (sdict
+		"1" "Steamfunk Aerodrome (1920)"
+		"2" "Singapore Circuit (WKC)"
+		"3" "Tibetan Turnpike (China)"
+		"4" "Shanghai Nights (China)"
+		"5" "Namsan Tour (Village)"
+		"6" "Bridge Run (Beach)"
+		"7" "Up 'N' Down (Village)"
+		"8" "Panda Paradise (Forest)"
+		"9" "Twin Gates (Village)"
+		"10" "Canal (Village)"
+		"11" "Lumberjack Lane (Forest)"
+		"License" "R")
+}}
+ 
+{{ if .ExecData }}
+	{{ $license := .ExecData.License }}
+	{{ $mapID := .ExecData.MapID }}
+	{{ $userID := .ExecData.UserID }}
+	{{ $time := .ExecData.Time }}
+	{{ $newPB := false }}
+ 
+	{{ if and (gt $license 0) (lt $license 5)}}
+		{{ $mapSet := sdict ($maps.Get (str $license)) }}
+		{{ if and (gt $mapID 0) (lt $mapID (len $mapSet)) }}
+			{{ $user := userArg $userID }}
+			{{ if $user }}
+				{{ if reFind "[0-1][0-9]:[0-5][0-9]:[0-9][0-9]" $time }}
+ 
+					{{/* Set New Map Record History */}}
+					{{ $newMapRecord := "" }}
+					{{ $newRecord := false }}
+					{{ $userMatch := false }}
+					{{ $userSet := false }}
+					{{ $equal := false }}
+					{{ $check := false }}
+					{{ $counter := 0 }}
+					{{ $mapDB := (dbGet $license (str $mapID)).Value }}
+					{{ if $mapDB }}
+						{{ range $k, $v := (split $mapDB " , ") }}
+							{{- $counter = $k -}}
+							{{- $userMatch = false -}}
+							{{- range $k1, $v1 := (split $v " . ") -}}
+								{{- if eq $k1 0 -}}
+									{{- $skip := false -}}
+									{{- range $k2, $v2 := (split $v1 ":") -}}
+										{{- range $k3, $v3 := (split $time ":") -}}
+											{{- if eq $k2 $k3 -}}
+												{{- if eq $k3 0 -}}
+													{{- if and (eq (toInt $v3) (toInt $v2)) -}} {{- $check = true -}}
+													{{- else if and (lt (toInt $v3) (toInt $v2)) -}} {{- $check = true -}} {{- $skip = true -}}
+													{{- else -}} {{- $check = false -}}
+													{{- end -}}
+												{{- else if and (eq $k3 1) (not $skip) -}}
+													{{- if and (lt (toInt $v3) (toInt $v2)) $check -}} {{- $equal = false -}}
+													{{- else if and (eq (toInt $v3) (toInt $v2)) $check -}} {{- $equal = true -}}
+													{{- else }} {{ $check = false -}}
+													{{- end -}}
+												{{- else if and (eq $k3 2) (not $skip) -}}
+													{{- if and (lt (toInt $v3) (toInt $v2)) $check $equal -}} {{- $check = true -}}
+													{{- else if and $check (not $equal) -}} {{- $check = true -}}
+													{{- else -}} {{- $check = false -}}
+													{{- end -}}
+												{{- end -}}
+											{{- end -}}
+										{{- end -}}
+									{{- end -}}
+								{{- else if eq $k1 1 -}} 
+									{{- if eq $v1 (str $userID) -}}
+										{{- $userMatch = true -}}
+									{{- end -}}
+								{{- end -}}
+							{{- end -}}
+							{{- if and (eq $k 0) $check -}}
+								{{- if $userMatch -}}
+									{{- $newMapRecord = joinStr "" $time " . " $userID -}}
+								{{- else -}}
+									{{- $newMapRecord = joinStr "" $time " . " $userID " , " $v -}}
+								{{- end -}}
+								{{- $newRecord = true -}}
+								{{- $check = false -}}
+								{{- $userSet = true -}}
+							{{- else if eq $k 0 -}}
+								{{- if $userMatch -}} 
+									{{- $userSet = true -}} 
+									{{- $check = false -}} 
+								{{- end -}}
+								{{- $newMapRecord = $v -}}			
+							{{- else if and (lt $k 9) (not $userMatch) -}}
+								{{- $newMapRecord = joinStr "" $newMapRecord " , " $v -}}
+							{{- else if and (lt $k 9) (not $userSet) $check -}}
+								{{- if eq $k 8 -}} 
+									{{- $newMapRecord = joinStr "" $newMapRecord " , " $time " . " $userID " , " $v -}}
+								{{- else -}}
+									{{- if $userMatch -}}
+										{{- $newMapRecord = joinStr "" $newMapRecord " , " $time " . " $userID -}}
+									{{- else -}}
+										{{- $newMapRecord = joinStr "" $newMapRecord " , " $time " . " $userID " , " $v -}}
+									{{- end -}}
+								{{- end -}}
+								{{- $newPB = true -}}
+								{{- $check = false -}}
+								{{- $userSet = true -}}
+							{{- else if eq $k 9 -}}
+								{{- if and (not $userSet) $check -}}
+									{{- $newMapRecord = joinStr "" $newMapRecord " , " $time " . " $userID -}}
+									{{- $userSet = true -}}
+								{{- else -}}
+									{{- $newMapRecord = joinStr "" $newMapRecord " , " $v -}}
+								{{- end -}}
+							{{- end -}}
+						{{ end }}
+					{{ else }}
+						{{ $newMapRecord = joinStr "" $time " . " $userID }}
+						{{ $newRecord = true }}
+					{{ end }}
+					{{ if and (lt $counter 9) (not $newRecord) (not $userSet) }}
+						{{ $newMapRecord = joinStr "" $newMapRecord " , " $time " . " $userID }}
+					{{ end }}
+					
+					{{ dbSet $license (str $mapID) $newMapRecord }}
+ 
+					{{/* Set New Personal Record History */}}
+					{{ if or $newRecord $newPB }}
+						{{ $newPersonalRecord := "" }}
+						{{ $personalDB := (dbGet $userID "records").Value }}
+						{{ if $personalDB }}
+							{{range $k, $v := (split $personalDB " , ")}}
+								{{if eq $k 0}}
+									{{ $newPersonalRecord = joinStr "" $license " . " $mapID " . " $time " , " $v }}
+								{{else if lt $k 9}}
+									{{ $newPersonalRecord = joinStr "" $newPersonalRecord " , " $v }} 
+								{{ end }}
+							{{end}}
+						{{ else }}
+							{{ $newPersonalRecord = joinStr "" $license " . " $mapID " . " $time }}
+						{{ end }}
+						{{ dbSet $userID "records" $newPersonalRecord }}
+					{{ end }}	
+ 
+					{{/* Send New Personal Best/Record embed to main channel */}}
+					{{ if $newRecord }}
+						{{ execCC 42 nil 0 (sdict "License" (toInt $license) "MapID" (toInt $mapID) "NewRecord" true) }}
+					{{ else if $newPB }}
+						{{ execCC 42 nil 0 (sdict "License" (toInt $license) "MapID" (toInt $mapID) "NewPB" true) }}
+					{{ else }}
+						{{- sendMessage nil (cembed
+							"title" "Try again!"
+							"description" (joinStr "" "<@!" $userID ">, you haven't beaten your personal best with this submission! Try a few more laps..." ) ) }}
+					{{ end }}
+				{{ else }}
+					{{ $error = 4 }}
+				{{ end }}
+			{{ else }}
+				{{ $error = 3 }}
+			{{ end }}
+		{{ else }}
+			{{ $error = 2 }}
+		{{ end }}
+	{{ else }}
+		{{ $error = 1 }}
+	{{ end }}
+{{ else }}
+	{{ $error = 5 }}
+{{ end }}
+ 
+{{ if ne $error 0 }}
+	{{ execCC 49 nil 0 (sdict "AdminOnly" true) }}
+{{ end }}
