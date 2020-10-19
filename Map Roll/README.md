@@ -1,18 +1,18 @@
-# [ 🎲 ] Map Roll Command Set
+# [ 🎲 ] [Map Roll Command Set](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/tree/main/Map%20Roll)
 
-### mapRoll
+### [mapRoll](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/mapRoll)
 Roll the dice for a random map using two dice: one for the license and the second for the map within that license. Also used to access help menu.
 
-### view
+### [view](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/view)
 View the records set by the guild members or view your own recent records.
 
-### submit
+### [submit](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/submit)
 Submit new records and a screenshot for validation (sent to admin channel).
 
-### set
+### [set](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/set)
 Set the admin and general use channels to be used for the commands.
 
-### delUser, delTrack, delRecord
+### [delUser](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/delUser), [delTrack](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/delTrack), [delRecord](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/delRecord)
 Delete the records for another user or yourself, delete a tracks entire record history, or delete a single record for a give map.
 
 #### Additional Emojis Used
