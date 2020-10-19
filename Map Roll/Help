@@ -1,0 +1,74 @@
+{{/*Help Menu System*/}}
+{{ $embed := cembed }}
+{{$prefix := index (reFindAllSubmatches `Prefix of \x60\d+\x60: \x60(.+)\x60` (exec "prefix")) 0 1}}
+{{$perms := "Administrator"}}
+{{ $admin := false }}
+{{if (reFind $perms (index (reFindAllSubmatches `.*\n\x60\d+\x60\n(.*)` (exec "viewperms")) 0 1))}}
+	{{ $admin = true }}
+{{ end }}
+{{ if .ExecData.MainMenu }}
+	{{ $desc := "" }}
+	{{if $admin }}
+		{{ $desc = joinStr "" "Choose an option to see more information about that command: \n\n`#1` **" $prefix "maproll**\n*Roll for a random map or get help.*\n\n`#2` **" $prefix "view**\n*View license and map records or your most recent record history.*\n\n`#3` **" $prefix "submit**\n*Automatically update your records if the required arguments are specified.*\n\n***Admin-Only Commands:*** \n\n`#4a` **" $prefix "set** \n`#4b` **" $prefix "deltrack** \n`#4c` **" $prefix "deluser** \n`#4d` **" $prefix "delrecord** \n*Set the admin channel and general use channel for this command set and delete track records, user record history, or individual map records.* \n\n<:DreadGaming:766240492840288276> Dreadnotic" }}
+	{{ else }}
+		{{ $desc = joinStr "" "Choose an option to see more information about that command: \n\n`#1` **" $prefix "maproll**\n*Roll for a random map or get help.*\n\n`#2` **" $prefix "view**\n*View license and map records or your most recent history.*\n\n`#3` **" $prefix "submit**\n*Automatically update your records if the required arguments are specified.*" }}
+	{{ end }}
+	{{ $embed = cembed
+		"title" "Map Roll Help Menu"
+		"color" 16579836
+		"thumbnail" (sdict "url" "https://i.imgur.com/jrXZdf2.png") 
+		"description" $desc }}
+{{ else if .ExecData.MapRoll }}
+	{{ $embed = cembed
+		"title" (joinStr "" "Command: " $prefix "maproll")
+		"color" 16579836
+		"thumbnail" (sdict "url" "https://i.imgur.com/jrXZdf2.png") 
+		"description" (joinStr "" "**Usage:** `" $prefix "maproll <optional argument>` \n**Arguments:** `help`\n\n*Roll the dice on all the maps or select a specific license level to roll for using the reaction system. Use the optional argument to access the help menu.*\n") }}
+{{ else if .ExecData.View }}
+	{{ $embed = cembed
+		"title" (joinStr "" "Command: " $prefix "view")
+		"color" 16579836
+		"thumbnail" (sdict "url" "https://i.imgur.com/jrXZdf2.png") 
+		"description" (joinStr "" "**Usage:** `" $prefix "view <License> <MapID> <records>` \n**Arguments:** `<License: L1, L2, L3, R, myrecord >` `<MapID: ID number of map>` `<records>`\n\n_**License Only:** Displays a list of all the maps in a license with their Map ID's, Record Time and Record User. \n**`myrecord` only:** Displays your 10 most recent records set. \n**License + MapID:** Displays the top record and map image for the specified map. \n**License + MapID + `records`:** Displays the top 10 records for the specified map._\n") }}
+{{ else if .ExecData.Submit }}
+	{{ $embed = cembed
+		"title" (joinStr "" "Command: " $prefix "submit")
+		"color" 16579836
+		"thumbnail" (sdict "url" "https://i.imgur.com/jrXZdf2.png") 
+		"description" (joinStr "" "**Usage:** `" $prefix "submit (+screenshot)` \n**Arguments:** `<License>` `<MapID>` `<Time>`\n\n_**All Arguments + Screenshot:** Submits your screenshot and updates the map leaderboard and personal record history log._\n\n**Argument Format:** \n`<License>`: `L1` `L2` `L3` `R` \n`<MapID>`: Number \n`<Time>`: 00:00:00") }}
+{{ else if and .ExecData.AdminOnly $admin }}
+	{{ $embed = cembed
+		"title" "Admin-Only Commands"
+		"color" 16579836
+		"thumbnail" (sdict "url" "https://i.imgur.com/jrXZdf2.png") 
+		"description" (joinStr "" "\n`#1` **" $prefix "set** \nArguments: (`admin` or `maproll`) `#channel-mention` \n_Set the channel for the general use of the Map Roll commands or set the channel for all the admin messages to be sent to (submissions). Requires a channel mention._ \n```" $prefix "set maproll #MapRolls``` \n`#2` **" $prefix "deltrack** \n_Arguments: `<License>` `<MapID>` \nRequires a license: `L1` `L2` `L3` `R` and a MapID number._ \n```" $prefix "deltrack L2 7``` \n`#3` **" $prefix "deluser** \n_Deletes your own recent records history or another users recent records history if used with a user mention._ \n```" $prefix "deluser @Dreadnotic``` \n`#4` **" $prefix "delrecord** \n_Arguments: `<License>` `<MapID>` `<Record #>` \nDeletes a specific record from a map leaderboard. Requires a `Record #` which is the position on the leaderboard for the specified map (e.g 4th = 4)._ \n```" $prefix "delrecord L2 7 5```") }}
+{{ else if .ExecData.Dreadnotic }}
+	{{ $embed = cembed
+		"title" "Dreadnotic"
+		"color" 16753920
+		"thumbnail" (sdict "url" "https://i.imgur.com/RWnPo5y.png") 
+		"description" "**About Me**\nStudying software engineering at university and writing custom commands for YAGPDB.xyz related to KartRider: Rush+.  I currently have several commands set up for this game, just ask for more information! You can find all my current source code on [GitHub]() which you can copy and paste into YAG bot on any server you have admin rights to. Keep in touch with me over on my personal server: [Dreadnotic's Server](https://discord.io/Dreadnotic) \n\n**Custom Command Requests**\nI will be available to write custom commands for a specific use case if requested. As payment for my time spent writing these commands I just ask for a small donation (either Patreon or as a Discord Nitro gift). Donations of Discord Nitro gifts (or equivalent Patreon donation) will grant one month server exclusivity for the command (with exception to my own testing server and main club server). Turnaround time depends on workload from university but is generally one week for a prototype and two weeks for a final product, but allow up to 3 weeks for full completion of complex commands. \n\n**Current Work Schedule**\n`#1` Map Generator with Record History \n`#2` Ranked/CPL Team Finder (update to v2.0) \n`#3` Update club tracking spreadsheet to work with other clubs \n\n**DreadBot**\nMy own bot, DreadBot, is currently a work in progress. As soon as more information is available I will post updates!" }}
+{{ end }}
+ 
+{{ if and .ExecData.MainMenu (not .ExecData.Reaction) }}
+	{{ $x := sendMessageRetID nil $embed }}
+	{{ if $admin }}
+		{{ addMessageReactions nil $x "1️⃣" "2️⃣" "3️⃣" "4️⃣" ":DreadGaming:766240492840288276" }}
+	{{ else }}
+		{{ addMessageReactions nil $x "1️⃣" "2️⃣" "3️⃣" ":DreadGaming:766240492840288276" }}
+	{{ end }}
+	{{ dbSet .User.ID "rollHelp" (str $x) }}
+{{ else if .ExecData.Reaction }}
+	{{ $msg := getMessage .ExecData.ChannelID .ExecData.MessageID }}
+	{{ if $msg.Embeds }}
+		{{ editMessage .ExecData.ChannelID .ExecData.MessageID (complexMessageEdit "embed" $embed) }}
+		{{ deleteAllMessageReactions .ExecData.ChannelID .ExecData.MessageID }}
+		{{ if .ExecData.EmojiNumbers }}
+			{{ addMessageReactions .ExecData.ChannelID .ExecData.MessageID "1️⃣" "2️⃣" "3️⃣" "4️⃣" ":DreadGaming:766240492840288276" }}
+		{{ else }}
+			{{ addMessageReactions .ExecData.ChannelID .ExecData.MessageID "⏪" }}
+		{{ end }}
+	{{ end }}
+{{ else }}
+	{{ sendMessage nil $embed }}
+{{ end }}
