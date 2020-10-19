@@ -1,0 +1,27 @@
+{{ if or (eq (str .Channel.ID) (dbGet .Guild.ID "mapRollChan").Value) (eq (str .Channel.ID) (dbGet .Guild.ID "adminChan").Value) }}
+{{ $args := parseArgs 0 "Type `?maproll help` for more information!" (carg "string" "help") }}
+{{ $png := "https://i.imgur.com/jrXZdf2.png" }}
+ 
+{{ if $args.IsSet 0 }}
+	{{ if eq (lower ($args.Get 0)) "help" }}
+		{{ execCC 49 nil 0 (sdict "MainMenu" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID) "EmojiNumbers" false) }}
+	{{ else }} 
+		{{ execCC 49 nil 0 (sdict "MapRoll" true) }}
+	{{ end }}	
+{{ else }}
+	{{ $embed := cembed
+		"title" "Roll for a Random Map"
+		"thumbnail" (sdict "url" $png)
+		"color" 16515843
+		"footer" (sdict "text" "Type `?maproll help` for more information")
+		"description" (joinStr "" "<@!" .User.ID "> press the dice reaction to roll for all licenses! \n\n<:L1:763074291297288212> L1 Maps only \n<:L2:763074290940772392> L2 Maps only \n<:L3:763074290567741481> L3 Maps only \n<:LR:763074290450169876> Rookie Maps only") }}
+	{{ $x := sendMessageRetID nil $embed }}
+	{{ dbSetExpire .User.ID "roll" (str $x) 360 }}
+	{{ addMessageReactions .Channel.ID $x "🎲" ":L1:763074291297288212" ":L2:763074290940772392" ":L3:763074290567741481" ":LR:763074290450169876" }}
+{{ end }}
+{{ else if hasRoleID 747036783774007366 }}
+	{{ $db := dbGet .Guild.ID "setup" }}
+	{{ if not $db }}
+		{{ sendMessage nil "Set up Map Roll commands using `?set maproll <channel mention>` to set the active Map Roll general use channel" }}
+	{{ end }}
+{{ end }}
