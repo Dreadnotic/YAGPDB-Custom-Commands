@@ -1,1 +1,4 @@
-![Dreads Logo](https://i.imgur.com/HOvNSr8.png) # Dreadnotic's KartRider: Rush+ CCs
+# Dreadnotic's KartRider: Rush+ CCs ![Dreads Logo](https://i.imgur.com/vmj1XWP.png)
+
+## [Map Roll](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/tree/main/Map%20Roll)
+A random map generator with leaderboards and recent record history.
