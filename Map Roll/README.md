@@ -13,7 +13,7 @@ Submit new records and a screenshot for validation (sent to admin channel).
 Set the admin and general use channels to be used for the commands.
 
 ### [delUser](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/delUser), [delTrack](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/delTrack), [delRecord](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/blob/main/Map%20Roll/delRecord)
-Delete the records for another user or yourself, delete a tracks entire record history, or delete a single record for a give map.
+Delete the records for another user or yourself, delete a tracks entire record history, or delete a single record for a given map.
 
 ### Additional Emojis Used
 ![L1 Emoji](https://i.imgur.com/7UFDa9c.png) ![L2 Emoji](https://i.imgur.com/mBi6Mer.png) ![L3 Emoji](https://i.imgur.com/RTEJILl.png) ![R Emoji](https://i.imgur.com/CXuj2sh.png)  ![Dread Emoji](https://i.imgur.com/HOvNSr8.png?1)
