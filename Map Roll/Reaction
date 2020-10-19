@@ -7,8 +7,10 @@
 {{ $data := sdict }}
 {{ $png := "https://i.imgur.com/jrXZdf2.png" }}
 {{ $gif := "https://i.imgur.com/0oIhjq1.gif" }}
+{{ $licenseEmoji := cslice "763074291297288212" "763074290940772392" "763074290567741481" "763074290450169876" }}
+{{ $dreadsEmoji := 766240492840288276 }}
  
-{{ if and (not .User.Bot) (or (inFold (cslice "1️⃣" "2️⃣" "3️⃣" "4️⃣" "⏪" ) .Reaction.Emoji.Name) (eq (str .Reaction.Emoji.ID) "766240492840288276")) }}
+{{ if and (not .User.Bot) (or (inFold (cslice "1️⃣" "2️⃣" "3️⃣" "4️⃣" "⏪" ) .Reaction.Emoji.Name) (eq .Reaction.Emoji.ID $dreadsEmoji)) }}
 	{{ $db := (dbGet .User.ID "rollHelp").Value }}
 	{{ if $db }}
 		{{ if eq (toInt $db) .Reaction.MessageID }}
@@ -22,12 +24,12 @@
 				{{ execCC 49 nil 0 (sdict "AdminOnly" true "Reaction" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID) "EmojiNumbers" false) }}
 			{{ else if eq .Reaction.Emoji.Name "⏪" }}
 				{{ execCC 49 nil 0 (sdict "MainMenu" true "Reaction" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID) "EmojiNumbers" true) }}
-			{{ else if eq (str .Reaction.Emoji.ID) "766240492840288276" }}
+			{{ else if eq .Reaction.Emoji.ID $dreadsEmoji }}
 				{{ execCC 49 nil 0 (sdict "Dreadnotic" true "Reaction" true "ChannelID" (str .Reaction.ChannelID) "MessageID" (str .Reaction.MessageID)) }}
 			{{ end }}	
 		{{ end }}
 	{{ end }}
-{{ else if and (not .User.Bot) (or (inFold (cslice "763074291297288212" "763074290940772392" "763074290567741481" "763074290450169876") (str .Reaction.Emoji.ID)) (eq .Reaction.Emoji.Name "🎲")) }}
+{{ else if and (not .User.Bot) (or (inFold $licenseEmoji (str .Reaction.Emoji.ID)) (eq .Reaction.Emoji.Name "🎲")) }}
 	{{ $dbRoll := dbGet .User.ID "roll" }}
 	{{ if $dbRoll }}
 		{{ $msg := (getMessage .Reaction.ChannelID .Reaction.MessageID) }}
@@ -47,10 +49,10 @@
 			{{ sleep 5 }}
 			{{ $roll1 := 0}}
 			{{ if eq .Reaction.Emoji.Name "🎲" }} {{ $roll1 = randInt 1 5 }}
-			{{ else if eq (str .Reaction.Emoji.ID) "763074291297288212" }} {{ $roll1 = 1 }} 
-			{{ else if eq (str .Reaction.Emoji.ID) "763074290940772392" }} {{ $roll1 = 2 }} 
-			{{ else if eq (str .Reaction.Emoji.ID) "763074290567741481" }} {{ $roll1 = 3 }} 
-			{{ else if eq (str .Reaction.Emoji.ID) "763074290450169876" }} {{ $roll1 = 4 }} 
+			{{ else if eq .Reaction.Emoji.ID (index $licenseEmoji 0) }} {{ $roll1 = 1 }} 
+			{{ else if eq .Reaction.Emoji.ID) (index $licenseEmoji 1) }} {{ $roll1 = 2 }} 
+			{{ else if eq .Reaction.Emoji.ID) (index $licenseEmoji 2) }} {{ $roll1 = 3 }} 
+			{{ else if eq .Reaction.Emoji.ID) (index $licenseEmoji 3) }} {{ $roll1 = 4 }} 
 			{{ end }}
 			{{ $roll2 := "" }}
 			{{ $license := "" }}
