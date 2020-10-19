@@ -1,4 +1,4 @@
-# Dreadnotic's KartRider: Rush+ CCs
+# Dreadnotic's KartRider: Rush+ CCs for YAGPDB.xyz
 
 ### [ 🎲 ] [Map Roll](https://github.com/Dreadnotic/YAGPDB-Custom-Commands/tree/main/Map%20Roll)
 A random map generator with leaderboards and recent record history.
