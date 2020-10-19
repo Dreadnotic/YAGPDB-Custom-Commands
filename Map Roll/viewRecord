@@ -1,0 +1,197 @@
+{{/* Required .ExecData: "License" int, "MapID" int (optional), "ShowRecord" bool (requires: MapID), "NewRecord" bool (requires: MapID), "NewPB" bool (requires: MapID) */}}
+{{/* Only one optional argument can be used per execution, "(requires: argument)" are extensions of the argument and only one can be per command execution */}}
+{{ $error := 0 }}
+{{ $maps := sdict
+"1" (sdict
+"1" (sdict "name" "Zigzag Downhill (Mine)" "url" "94IgvnI.png")
+"2" (sdict "name" "Dizzying Downhill (Forest)" "url" "PF9wcOu.png")
+"3" (sdict "name" "Cosmic Canyon (Northeu)" "url" "bgR2iTi.png")
+"4" (sdict "name" "Unfinished Zone 5 (Factory)" "url" "zIppbwl.png")
+"5" (sdict "name" "Demon King's Invitation (Tomb)" "url" "UolWt1n.png")
+"6" (sdict "name" "The Gate of the Wonderland (Storybook)" "url" "kb9jjDX.png")
+"License" (sdict "name" "L1" "url" "https://i.imgur.com/tMaEUUF.png" "color" 15955356) )
+"2" (sdict
+"1" (sdict "name" "Brazil Circuit (WKC)" "url" "nRmtqC6.png")
+"2" (sdict "name" "Twirling Construction Site (Desert)" "url" "ZzJgY6E.png")
+"3" (sdict "name" "Canopy Curve (Forest)" "url" "KH58ht4.png")
+"4" (sdict "name" "Boombeard's Hideout (Pirate)" "url" "VOGUy8B.png")
+"5" (sdict "name" "Hidden Treasure (Pirate)" "url" "doiHNgJ.png")
+"6" (sdict "name" "The Great Wall (Village)" "url" "bzU2qBf.png")
+"7" (sdict "name" "Boomhill Tunnel (Village)" "url" "FypMHnl.png")
+"8" (sdict "name" "Secrets of the Temple (Fairy)" "url" "XdwJIhc.png")
+"9" (sdict "name" "Frost Valley (Ice)" "url" "4k4xxzv.png")
+"10" (sdict "name" "Terracotta Twister (China)" "url" "AnPlOXi.png")
+"11" (sdict "name" "Huangshan Highway (China)" "url" "CzohW0Q.png")
+"12" (sdict "name" "Temple of Vroom (Gold)" "url" "tvBG1Xy.png")
+"13" (sdict "name" "Secret Basement (Castle)" "url" "joXFQ8d.png")
+"License" (sdict "name" "L2" "url" "https://i.imgur.com/EeYxWrX.png" "color" 2343131) )
+"3" (sdict 
+"1" (sdict "name" "Training Center (Sword)" "url" "fFCY3FY.png")
+"2" (sdict "name" "Rio Downhill (World)" "url" "nnfk89F.png")
+"3" (sdict "name" "The Forgotten City (Mechanic)" "url" "V9clAwe.png")
+"4" (sdict "name" "Shipping Lanes (Beach)" "url" "eI1Jqwt.png")
+"5" (sdict "name" "Paris Grand Prix (World)" "url" "MtlH1KS.png")
+"6" (sdict "name" "Dinosaur Arena (Jurassic)" "url" "dw5V8c5.png")
+"7" (sdict "name" "The Bridge of Fate (Village)" "url" "X8JQXLH.png")
+"8" (sdict "name" "Toy Factory (Block)" "url" "AN9tJzt.png")
+"9" (sdict "name" "Downtown Dubai (World)" "url" "0pE0FUC.png")
+"10" (sdict "name" "Korea Circuit (WKC)" "url" "otHpQPX.png")
+"11" (sdict "name" "Rainslick Raceway (Moonhill)" "url" "IZYG0j5.png")
+"12" (sdict "name" "Dragon's Descent (Sword)" "url" "2Fg6FvC.png")
+"License" (sdict "name" "L3" "url" "https://i.imgur.com/QzQUbUB.png" "color" 7196506) )
+"4" (sdict
+"1" (sdict "name" "Steamfunk Aerodrome (1920)" "url" "ZVH62gs.png")
+"2" (sdict "name" "Singapore Circuit (WKC)" "url" "nuYe0SX.png")
+"3" (sdict "name" "Tibetan Turnpike (China)" "url" "QOLQV6R.png")
+"4" (sdict "name" "Shanghai Nights (China)" "url" "7jnq3IN.png")
+"5" (sdict "name" "Namsan Tour (Village)" "url" "NHaqyl1.png")
+"6" (sdict "name" "Bridge Run (Beach)" "url" "L1eQWMY.png")
+"7" (sdict "name" "Up 'N' Down (Village)" "url" "UdjEAHA.png")
+"8" (sdict "name" "Panda Paradise (Forest)" "url" "Zp5gw1e.png")
+"9" (sdict "name" "Twin Gates (Village)" "url" "gzjpQAl.png")
+"10" (sdict "name" "Canal (Village)" "url" "X69dWl1.png")
+"11" (sdict "name" "Lumberjack Lane (Forest)" "url" "EvCy0iV.png")
+"License" (sdict "name" "R" "url" "https://i.imgur.com/RP9EPXn.png" "color" 15707932) ) }}
+{{$personalRecord:=.ExecData.MyRecord}} {{$license:=.ExecData.License}} {{$mapID:=.ExecData.MapID}}
+{{$title:=""}} {{$thumbnail:=sdict}} {{$image:=sdict}} {{$color:=0}} {{$desc:=""}} {{$footer:=sdict}}
+{{$records:=""}}
+{{if .ExecData }}
+{{if and (gt (toInt $license) 0) (lt (toInt $license) 5)}}
+{{$mapSet := sdict ($maps.Get (str $license)) }}
+{{if .ExecData.MapID }}
+{{if and (gt $mapID 0) (lt $mapID (len $mapSet)) }}
+{{/* Send New Record embed */}}
+{{if and (not .ExecData.ShowRecord) (not .ExecData.FlagError) }}
+{{if .ExecData.NewRecord }}
+{{$title = "New Record!" }}
+{{else if .ExecData.NewPB}}
+{{$title = "New Personal Best!"}}
+{{else}} 
+{{$title = "View Map" }}
+{{end}}
+{{$thumbnail = sdict "url" (($mapSet.Get "License").Get "url") }}
+{{$image = sdict "url" (joinStr "" "https://i.imgur.com/" (($mapSet.Get (str $mapID)).Get "url")) }}
+{{$color = ($mapSet.Get "License").Get "color" }}
+{{$footer = sdict "text" (joinStr "" "Map ID: #" $mapID) }}
+{{$mapDB := (dbGet $license $mapID).Value }}
+{{if $mapDB }}
+{{range $k, $v := (split $mapDB " , ") }}
+{{if eq $k 0 }}
+{{range $k1, $v1 := (split $v " . ") }}
+{{if eq $k1 0 }}
+{{$desc = joinStr "" "**License:** " (($mapSet.Get "License").Get "name") "\n**Track:** " (($mapSet.Get (str $mapID)).Get "name") "\n**Time:** " $v1 }}
+{{else}}
+{{$desc = joinStr "" $desc "\n**User:** <@!" $v1 ">" }}
+{{end}}
+{{end}}
+{{end}}
+{{end}}
+{{else}}
+{{$desc = joinStr "" "**License:** " (($mapSet.Get "License").Get "name") "\n**Track:** " (($mapSet.Get (str $mapID)).Get "name") "\n**Time:** 00:00:00 \n**User:** Not Set" }}
+{{end}}
+{{/* Set Record History string */}}
+{{else if and .ExecData.ShowRecord (not .ExecData.FlagError) }}
+{{$mapDB := (dbGet $license $mapID).Value }}
+{{if $mapDB }}
+{{range $k, $v := (split $mapDB " , ") }}
+{{range $k1, $v1 := (split $v " . ") }}
+{{if and (eq $k 0) (eq $k1 0) }}
+{{$desc = joinStr "" $desc "1. **Time:** " $v1 }}
+{{else if eq $k1 0 }}
+{{$desc = joinStr "" $desc "\n\n" (str (add $k 1)) ". **Time:** " $v1 }}
+{{else}}
+{{$desc = joinStr "" $desc "\n**User:** <@!" $v1 ">" }}
+{{end}}
+{{end}}
+{{end}}
+{{end}}
+{{$title = ($mapSet.Get (str $mapID)).Get "name" }}
+{{$thumbnail = sdict "url" (($mapSet.Get "License").Get "url") }}
+{{$image = sdict "url" (joinStr "" "https://i.imgur.com/" (($mapSet.Get (str $mapID)).Get "url")) }}
+{{$color = ($mapSet.Get "License").Get "color" }}
+{{$footer = sdict "text" (joinStr "" "Map ID: #" $mapID) }}
+{{else if .ExecData.FlagError }}
+{{$error = 4 }}
+{{end}}
+{{else}}
+{{$error = 2 }}
+{{end}}
+{{else}}
+{{/* Show first record of all maps in the license */}}
+{{$records := sdict }}
+{{range dbGetPattern $license "%" 15 0 }}
+{{$records.Set .Key .Value }}
+{{end}}
+{{range $x := seq 1 (len $mapSet) }}
+{{/* Get the 1st record from each map */}}
+{{$record := sdict }}
+{{range $k, $v := (split (str ($records.Get (str $x)))  " , ") }}
+{{if eq $k 0 }}
+{{range $k1, $v1 := (split $v " . ") }}
+{{if eq $k1 0 }}
+{{$record.Set  "Time" $v1 }}
+{{else}}
+{{$record.Set "UserID" $v1 }}
+{{end}}
+{{end}}
+{{end}}
+{{end}}
+{{if not ($record.Get "Time") }}
+{{$record.Set "Time" "00:00:00" }}
+{{$record.Set "UserID" "Not Set" }}
+{{end}}
+{{$desc = joinStr "" $desc "\n\n`#" (str $x) "` **" (($mapSet.Get (str $x)).Get "name") "**\n_Time:_ `" ($record.Get "Time") "`    _User:_ <@!" ($record.Get "UserID") ">" }}
+{{end}}
+{{$title = joinStr "" (($mapSet.Get "License").Get "name") " License Records" }}
+{{$thumbnail = sdict "url" (($mapSet.Get "License").Get "url") }}
+{{$color = ($mapSet.Get "License").Get "color" }}
+{{end}}
+{{else if .ExecData.MyRecord }}
+{{$mapSet := sdict }}
+{{$myRecords := sdict }}
+{{$db := (dbGet .User.ID "records").Value }}
+{{if $db }}
+{{range $k, $v := (split $db  " , ") }}
+{{range $k1, $v1 := (split $v " . ") }}
+{{if eq $k1 0 }}
+{{if eq $v1 "1" }}
+{{$mapSet = sdict ($maps.Get "1") }}
+{{$myRecords.Set  "License" "L1" }}
+{{else if eq $v1 "2" }}
+{{$mapSet = sdict ($maps.Get "2") }}
+{{$myRecords.Set  "License" "L2" }}
+{{else if eq $v1 "3" }}
+{{$mapSet = sdict ($maps.Get "3") }}
+{{$myRecords.Set  "License" "L3" }}
+{{else if eq $v1 "4" }}
+{{$mapSet = sdict ($maps.Get "4") }}
+{{$myRecords.Set  "License" "R" }}
+{{end}}
+{{else if eq $k1 1 }}
+{{$myRecords.Set "MapID" $v1 }}
+{{else}}
+{{$myRecords.Set "Time" $v1 }}
+{{end}}
+{{end}}
+{{if eq $k 0 }}
+{{$desc = joinStr "" "\n\n `#" ($myRecords.Get "MapID") "` **" (($mapSet.Get ($myRecords.Get "MapID")).Get "name") "** \n_License:_ `" ($myRecords.Get "License") "` _Time:_ `" ($myRecords.Get "Time") "`" }}
+{{else}}
+{{$desc = joinStr "" $desc "\n\n`#" ($myRecords.Get "MapID") "` **" (($mapSet.Get ($myRecords.Get "MapID")).Get "name") "**\n_License:_ `" ($myRecords.Get "License") "` _Time:_ `" ($myRecords.Get "Time") "`" }}
+{{end}}
+{{end}}
+{{else}}
+{{$desc = "\nNo map records set!" }}
+{{end}}
+{{$desc =  joinStr "" "<@!" .User.ID ">**'s Recent Records**" $desc }}
+{{$thumbnail = sdict "url" (.User.AvatarURL "256") }}
+{{$color = 16316671 }}
+{{else}}
+{{$error = 1}}
+{{end}}
+{{else}}
+{{$error = 3}}
+{{end}}
+{{if ne $error 0 }}
+{{ execCC 49 nil 0 (sdict "View" true) }}
+{{else}} {{sendMessage nil (cembed "title" $title "thumbnail" $thumbnail "image" $image "color" $color "description" $desc "footer" $footer) }}
+{{end}}
