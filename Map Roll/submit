@@ -1,0 +1,78 @@
+{{ if eq (str .Channel.ID) (dbGet .Guild.ID "mapRollChan").Value }}
+{{ $args := parseArgs 0 "Something went wrong!" (carg "string" "License") (carg "int" "MapID") (carg "string" "Time") }}
+{{ $error := 0 }}
+{{ $desc := "" }}
+{{ $color := 0 }}
+{{ $data := sdict }}
+{{ $license := "" }}
+ 
+{{ if not .Message.Attachments }}
+	{{ $error = 1 }}
+{{ end }} 
+ 
+{{ if and ($args.IsSet 0) (eq $error 0) }}
+	{{ $license = upper ($args.Get 0)}}
+	{{ $mapCount := 0 }}
+	{{ if $args.IsSet 1 }}
+		{{ if eq $license "L1" }}
+			{{ $data.Set "License" 1 }}
+			{{ $mapCount = 6 }}
+			{{ $color = 15955356 }}
+		{{ else if eq $license "L2" }}
+			{{ $data.Set "License" 2 }}
+			{{ $mapCount = 13 }}
+			{{ $color = 2343131 }}
+		{{ else if eq $license "L3" }}
+			{{ $data.Set "License" 3 }}
+			{{ $mapCount = 12 }}
+			{{ $color = 7196506 }}
+		{{ else if eq $license "R" }}
+			{{ $data.Set "License" 4 }}
+			{{ $mapCount = 11 }}
+			{{ $color = 15707932 }}
+		{{ else }} {{ $error = 2 }}
+		{{ end }}
+		{{ if and (gt ($args.Get 1) 0) (lt ($args.Get 1) (add $mapCount 1)) (eq $error 0)}}
+			{{ $data.Set "MapID" ($args.Get 1) }}
+			{{ $data.Set "UserID" .User.ID }}
+			{{ if reFind "[0-1][0-9]:[0-5][0-9]:[0-9][0-9]" ($args.Get 2) }}
+				{{ $data.Set "Time" ($args.Get 2) }}
+			{{ else }} {{ $error = 4 }}
+			{{ end }}
+		{{ else }} {{ $error = 3 }}
+		{{ end }}
+	{{ else }} {{ $error = 3 }}
+	{{ end }}
+{{ else }} {{ $error = 1 }}
+{{ end }}
+ 
+{{ if ne $error 0 }}
+	{{ execCC 49 nil 0 (sdict "Submit" true) }}
+{{ else }}
+	{{ $image := sdict }}
+	{{ if $args.IsSet 0 }}
+		{{ addMessageReactions .Channel.ID .Message.ID "✅" }}
+		{{ $desc = joinStr "" "<@!" .User.ID "> submitted a new record!\n\n**License:** " $license "\n**MapID:** #" ($data.Get "MapID") "\n**Time:** " ($data.Get "Time") "\n\nView submission [here!](https://discordapp.com/channels/" .Guild.ID "/" .Channel.ID "/" .Message.ID ")" }}
+		{{ $image.Set "url" (index .Message.Attachments 0).URL }} 
+	{{ else }}
+		{{ addMessageReactions .Channel.ID .Message.ID "✅" }}
+		{{ $desc = joinStr "" "<@!" .User.ID "> submitted a new record!" }}
+		{{ $image.Set "url" (index .Message.Attachments 0).URL }} 
+	{{ end }}
+	{{ $submissions := (dbGet .Guild.ID "submitChan").Value }}
+	{{ if $submissions }}
+		{{ sendMessage (toInt $submissions) (cembed
+				"description" $desc
+				"image" $image
+				"color" $color
+				"thumbnail" (sdict "url" (.User.AvatarURL "256")) ) }}
+		{{ if $args.IsSet 0 }}
+			{{ execCC 41 nil 0 $data }}
+		{{ end }}
+	{{ else }}
+		{{ sendMessage nil (cembed
+			"title" "Submissions Channel not set!"
+			"description" "The submissions channel needs to be set using: `?setsubmissions` \n_Note: Admin only command_" ) }}
+	{{ end }}
+{{ end }}
+{{ end }}
