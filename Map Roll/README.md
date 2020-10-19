@@ -16,4 +16,4 @@ Set the admin and general use channels to be used for the commands.
 Delete the records for another user or yourself, delete a tracks entire record history, or delete a single record for a give map.
 
 #### Additional Emojis Used
-![L1 Emoji](https://i.imgur.com/7UFDa9c.png) ![L2 Emoji](https://i.imgur.com/mBi6Mer.png) ![L3 Emoji](https://i.imgur.com/RTEJILl.png) ![R Emoji](https://i.imgur.com/CXuj2sh.png) ![Dread Emoji](https://i.imgur.com/vmj1XWP.png)
+![L1 Emoji](https://i.imgur.com/7UFDa9c.png) ![L2 Emoji](https://i.imgur.com/mBi6Mer.png) ![L3 Emoji](https://i.imgur.com/RTEJILl.png) ![R Emoji](https://i.imgur.com/CXuj2sh.png)  ![Dread Emoji](https://i.imgur.com/HOvNSr8.png)
